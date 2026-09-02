@@ -20,14 +20,16 @@ jobs:
           distribution: 'temurin'
       
       - name: Compile Java code
+        shell: cmd
         run: |
           dir /s src
-          mkdir target\classes -Force
+          mkdir target\classes
           javac -d target\classes src\*.java
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if %errorlevel% neq 0 exit /b %errorlevel%
           dir /s target\classes
       
       - name: Create JAR file
+        shell: cmd
         run: |
           cd target\classes
           jar cfe ..\DragonGame.jar Game *.class
@@ -38,14 +40,9 @@ jobs:
         run: choco install wixtoolset -y
       
       - name: Create EXE with jpackage
+        shell: cmd
         run: |
-          jpackage `
-            --type exe `
-            --input target `
-            --name DragonGame `
-            --main-jar DragonGame.jar `
-            --dest output `
-            --verbose
+          jpackage --type exe --input target --name DragonGame --main-jar DragonGame.jar --dest output --verbose
       
       - name: Upload EXE
         uses: actions/upload-artifact@v4
