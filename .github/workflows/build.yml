@@ -24,7 +24,7 @@ jobs:
         run: |
           dir /s src
           mkdir target\classes
-          javac -d target\classes src\*.java
+          javac -encoding UTF-8 -d target\classes src\*.java
           if %errorlevel% neq 0 exit /b %errorlevel%
           dir /s target\classes
       
