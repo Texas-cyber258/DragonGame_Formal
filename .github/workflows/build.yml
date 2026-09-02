@@ -1,0 +1,54 @@
+name: Build Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
+      - name: Compile Java code
+        run: |
+          dir /s src
+          mkdir target\classes
+          javac -d target\classes src\*.java
+          if %errorlevel% neq 0 exit /b %errorlevel%
+          dir /s target\classes
+      
+      - name: Create JAR file
+        run: |
+          cd target\classes
+          jar cfe ..\DragonGame.jar Game *.class
+          cd ..\..
+          dir target
+      
+      - name: Install WiX Toolset
+        run: choco install wixtoolset -y
+      
+      - name: Create EXE with jpackage
+        run: |
+          jpackage `
+            --type exe `
+            --input target `
+            --name DragonGame `
+            --main-jar DragonGame.jar `
+            --dest output `
+            --verbose
+      
+      - name: Upload EXE
+        uses: actions/upload-artifact@v3
+        with:
+          name: Windows-Installer
+          path: output/*.exe
