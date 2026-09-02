@@ -11,10 +11,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # 从 v3 升级到 v4
+        uses: actions/checkout@v4
       
       - name: Setup JDK 17
-        uses: actions/setup-java@v5  # 从 v3 升级到 v5
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -22,9 +22,9 @@ jobs:
       - name: Compile Java code
         run: |
           dir /s src
-          mkdir target\classes
+          mkdir target\classes -Force
           javac -d target\classes src\*.java
-          if %errorlevel% neq 0 exit /b %errorlevel%
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dir /s target\classes
       
       - name: Create JAR file
@@ -48,7 +48,7 @@ jobs:
             --verbose
       
       - name: Upload EXE
-        uses: actions/upload-artifact@v4  # 保持 v4
+        uses: actions/upload-artifact@v4
         with:
           name: Windows-Installer
           path: output/*.exe
